@@ -43,6 +43,48 @@ adminkonstantin@2OSUbuntu:~/systemd$ vagrant ssh
 [root@systemd ~]# cd /etc/sysconfig/
 ```
 
+### **Из epel установить spawn-fcgi и переписать init-скрипт на unit-файл. Имя сервиса должно называться также.** ###
+
+Устанавливаем spawn-fcgi и необходимые для него пакеты:
+
+```
+[root@systemd system]# yum install epel-release -y && yum install spawn-fcgi php php-cli -y
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```
 [root@systemd sysconfig]# touch watchlog
 ```
