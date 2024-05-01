@@ -247,6 +247,162 @@ May  1 14:07:51 magma systemd[1]: watchlog.service: Succeeded.
 [root@systemd system]# yum install epel-release -y && yum install spawn-fcgi php php-cli -y
 ```
 
+Раскомментируем строки с переменными в /etc/sysconfig/spawn-fcgi:
+
+```
+# You must set some working options before the "spawn-fcgi" service will work.
+# If SOCKET points to a file, then this file is cleaned up by the init script.
+#
+# See spawn-fcgi(1) for all possible options.
+#
+# Example :
+SOCKET=/var/run/php-fcgi.sock
+OPTIONS="-u apache -g apache -s $SOCKET -S -M 0600 -C 32 -F 1 --/usr/bin/php-cgi"
+
+
+
+
+
+
+
+
+
+
+
+
+^G Get Help	 ^O Write Out     ^W Where Is	   ^K Cut Text      ^J Justify       ^C Cur Pos       M-U Undo         M-A Mark Text    M-] To Bracket   M-▲ Previous     ^B Back
+^X Exit          ^R Read File     ^\ Replace	   ^U Uncut Text    ^T To Spell      ^_ Go To Line    M-E Redo         M-6 Copy Text    M-W WhereIs Next M-▼ Next         ^F Forward
+```
+
+Создаём юнит spawn-fcgi.service:
+
+```
+[root@systemd system]# cd /etc/systemd/system/
+```
+
+```
+[root@systemd system]# touch spawn-fcgi.service
+```
+
+```
+[root@systemd system]# nano spawn-fcgi.service 
+```
+
+```
+  GNU nano 2.9.8                                                                          spawn-fcgi.service                                                                          Modified  
+
+[Unit]
+Description=Spawn-fcgi startup service by Otus
+After=network.target
+
+[Service]
+Type=simple
+PIDFile=/var/run/spawn-fcgi.pid
+EnvironmentFile=/etc/sysconfig/spawn-fcgi
+ExecStart=/usr/bin/spawn-fcgi -n $OPTIONS
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
+
+
+
+^G Get Help	 ^O Write Out     ^W Where Is	   ^K Cut Text      ^J Justify       ^C Cur Pos       M-U Undo         M-A Mark Text    M-] To Bracket   M-▲ Previous     ^B Back
+^X Exit          ^R Read File     ^\ Replace	   ^U Uncut Text    ^T To Spell      ^_ Go To Line    M-E Redo         M-6 Copy Text    M-W WhereIs Next M-▼ Next         ^F Forward
+```
+
+```
+[root@systemd system]# chmod 664 /etc/systemd/system/spawn-fcgi.service 
+```
+
+Убеждаемся, что все успешно работает:
+
+```
+[root@systemd init.d]# systemctl start spawn-fcgi
+```
+
+```
+[root@systemd init.d]# systemctl status spawn-fcgi
+```
+
+```
+● spawn-fcgi.service - Spawn-fcgi startup service by Otus
+   Loaded: loaded (/etc/systemd/system/spawn-fcgi.service; disabled; vendor preset: disabled)
+   Active: active (running) since Wed 2024-05-01 15:11:39 UTC; 7s ago
+ Main PID: 30492 (php-cgi)
+    Tasks: 33 (limit: 4617)
+   Memory: 20.4M
+   CGroup: /system.slice/spawn-fcgi.service
+           ├─30492 /usr/bin/php-cgi
+           ├─30498 /usr/bin/php-cgi
+           ├─30499 /usr/bin/php-cgi
+           ├─30500 /usr/bin/php-cgi
+           ├─30501 /usr/bin/php-cgi
+           ├─30502 /usr/bin/php-cgi
+           ├─30503 /usr/bin/php-cgi
+           ├─30504 /usr/bin/php-cgi
+           ├─30505 /usr/bin/php-cgi
+           ├─30506 /usr/bin/php-cgi
+           ├─30507 /usr/bin/php-cgi
+           ├─30508 /usr/bin/php-cgi
+● spawn-fcgi.service - Spawn-fcgi startup service by Otus
+   Loaded: loaded (/etc/systemd/system/spawn-fcgi.service; disabled; vendor preset: disabled)
+   Active: active (running) since Wed 2024-05-01 15:11:39 UTC; 7s ago
+ Main PID: 30492 (php-cgi)
+    Tasks: 33 (limit: 4617)
+   Memory: 20.4M
+   CGroup: /system.slice/spawn-fcgi.service
+           ├─30492 /usr/bin/php-cgi
+           ├─30498 /usr/bin/php-cgi
+           ├─30499 /usr/bin/php-cgi
+           ├─30500 /usr/bin/php-cgi
+           ├─30501 /usr/bin/php-cgi
+           ├─30502 /usr/bin/php-cgi
+           ├─30503 /usr/bin/php-cgi
+           ├─30504 /usr/bin/php-cgi
+           ├─30505 /usr/bin/php-cgi
+           ├─30506 /usr/bin/php-cgi
+           ├─30507 /usr/bin/php-cgi
+           ├─30508 /usr/bin/php-cgi
+           ├─30509 /usr/bin/php-cgi
+           ├─30510 /usr/bin/php-cgi
+           ├─30511 /usr/bin/php-cgi
+           ├─30512 /usr/bin/php-cgi
+           ├─30513 /usr/bin/php-cgi
+           ├─30514 /usr/bin/php-cgi
+           ├─30515 /usr/bin/php-cgi
+           ├─30516 /usr/bin/php-cgi
+           ├─30517 /usr/bin/php-cgi
+           ├─30518 /usr/bin/php-cgi
+           ├─30519 /usr/bin/php-cgi
+           ├─30520 /usr/bin/php-cgi
+           ├─30521 /usr/bin/php-cgi
+           ├─30522 /usr/bin/php-cgi
+           ├─30523 /usr/bin/php-cgi
+           ├─30524 /usr/bin/php-cgi
+           ├─30525 /usr/bin/php-cgi
+           ├─30526 /usr/bin/php-cgi
+           ├─30527 /usr/bin/php-cgi
+           ├─30528 /usr/bin/php-cgi
+           └─30529 /usr/bin/php-cgi
+
+May 01 15:11:39 systemd systemd[1]: Started Spawn-fcgi startup service by Otus.
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
