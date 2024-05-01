@@ -566,17 +566,63 @@ tcp   LISTEN 0      511          0.0.0.0:8080      0.0.0.0:*    users:(("httpd",
 tcp   LISTEN 0      511          0.0.0.0:80        0.0.0.0:*    users:(("httpd",pid=30900,fd=3),("httpd",pid=30899,fd=3),("httpd",pid=30898,fd=3),("httpd",pid=30896,fd=3))
 ```
 
+Проверим статус служб:
 
+```
+[root@systemd ~]# systemctl status httpd@first.service
+```
 
+```
+● httpd@first.service - The Apache HTTP Server
+   Loaded: loaded (/usr/lib/systemd/system/httpd@.service; disabled; vendor preset: disabled)
+   Active: active (running) since Wed 2024-05-01 17:16:50 UTC; 26s ago
+     Docs: man:httpd@.service(8)
+  Process: 1078 ExecStartPre=/bin/chown root.apache /run/httpd/instance-first (code=exited, status=0/SUCCESS)
+  Process: 1076 ExecStartPre=/bin/mkdir -m 710 -p /run/httpd/instance-first (code=exited, status=0/SUCCESS)
+ Main PID: 1080 (httpd)
+   Status: "Running, listening on: port 80"
+    Tasks: 213 (limit: 4617)
+   Memory: 30.1M
+   CGroup: /system.slice/system-httpd.slice/httpd@first.service
+           ├─1080 /usr/sbin/httpd -DFOREGROUND -f conf/first.conf
+           ├─1081 /usr/sbin/httpd -DFOREGROUND -f conf/first.conf
+           ├─1082 /usr/sbin/httpd -DFOREGROUND -f conf/first.conf
+           ├─1083 /usr/sbin/httpd -DFOREGROUND -f conf/first.conf
+           └─1084 /usr/sbin/httpd -DFOREGROUND -f conf/first.conf
 
+May 01 17:16:49 systemd systemd[1]: Starting The Apache HTTP Server...
+May 01 17:16:50 systemd httpd[1080]: AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 127.0.1.1. Set the 'ServerName' directive globally to suppres>
+May 01 17:16:50 systemd systemd[1]: Started The Apache HTTP Server.
+May 01 17:16:50 systemd httpd[1080]: Server configured, listening on: port 80
+```
 
+```
+[root@systemd ~]# systemctl status httpd@second.service
+```
 
+```
+● httpd@second.service - The Apache HTTP Server
+   Loaded: loaded (/usr/lib/systemd/system/httpd@.service; disabled; vendor preset: disabled)
+   Active: active (running) since Wed 2024-05-01 17:16:56 UTC; 32s ago
+     Docs: man:httpd@.service(8)
+  Process: 1300 ExecStartPre=/bin/chown root.apache /run/httpd/instance-second (code=exited, status=0/SUCCESS)
+  Process: 1298 ExecStartPre=/bin/mkdir -m 710 -p /run/httpd/instance-second (code=exited, status=0/SUCCESS)
+ Main PID: 1302 (httpd)
+   Status: "Running, listening on: port 8080"
+    Tasks: 213 (limit: 4617)
+   Memory: 31.1M
+   CGroup: /system.slice/system-httpd.slice/httpd@second.service
+           ├─1302 /usr/sbin/httpd -DFOREGROUND -f conf/second.conf
+           ├─1303 /usr/sbin/httpd -DFOREGROUND -f conf/second.conf
+           ├─1304 /usr/sbin/httpd -DFOREGROUND -f conf/second.conf
+           ├─1305 /usr/sbin/httpd -DFOREGROUND -f conf/second.conf
+           └─1306 /usr/sbin/httpd -DFOREGROUND -f conf/second.conf
 
-
-
-
-
-
+May 01 17:16:56 systemd systemd[1]: Starting The Apache HTTP Server...
+May 01 17:16:56 systemd httpd[1302]: AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 127.0.1.1. Set the 'ServerName' directive globally to suppres>
+May 01 17:16:56 systemd systemd[1]: Started The Apache HTTP Server.
+May 01 17:16:56 systemd httpd[1302]: Server configured, listening on: port 8080
+```
 
 
 
