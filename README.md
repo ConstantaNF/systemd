@@ -43,48 +43,6 @@ adminkonstantin@2OSUbuntu:~/systemd$ vagrant ssh
 [root@systemd ~]# cd /etc/sysconfig/
 ```
 
-### **Из epel установить spawn-fcgi и переписать init-скрипт на unit-файл. Имя сервиса должно называться также.** ###
-
-Устанавливаем spawn-fcgi и необходимые для него пакеты:
-
-```
-[root@systemd system]# yum install epel-release -y && yum install spawn-fcgi php php-cli -y
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```
 [root@systemd sysconfig]# touch watchlog
 ```
@@ -281,7 +239,13 @@ May  1 14:07:51 magma root[29452]: Wed May  1 14:07:51 UTC 2024: I found word, M
 May  1 14:07:51 magma systemd[1]: watchlog.service: Succeeded.
 ```
 
+### **Из epel установить spawn-fcgi и переписать init-скрипт на unit-файл. Имя сервиса должно называться также.** ###
 
+Устанавливаем spawn-fcgi и необходимые для него пакеты:
+
+```
+[root@systemd system]# yum install epel-release -y && yum install spawn-fcgi php php-cli -y
+```
 
 
 
