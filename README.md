@@ -393,6 +393,269 @@ WantedBy=multi-user.target
 May 01 15:11:39 systemd systemd[1]: Started Spawn-fcgi startup service by Otus.
 ```
 
+### **Дополнить юнит-файл apache httpd возможностью запустить несколько инстансов сервера с разными конфигами** ###
+
+Для запуска нескольких экземпляров сервиса будем использовать шаблон в конфигурации файла окружения `/usr/lib/systemd/system/httpd.service`:
+
+```
+[Unit]
+Description=The Apache HTTP Server
+Wants=httpd-init.service
+
+After=network.target remote-fs.target nss-lookup.target httpd-
+init.service
+
+Documentation=man:httpd.service(8)
+
+[Service]
+Type=notify
+Environment=LANG=C
+EnvironmentFile=/etc/sysconfig/httpd-%I
+ExecStart=/usr/sbin/httpd $OPTIONS -DFOREGROUND
+ExecReload=/usr/sbin/httpd $OPTIONS -k graceful
+# Send SIGWINCH for graceful stop
+KillSignal=SIGWINCH
+KillMode=mixed
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Создаём файлы окружения, в которых задается опция для запуска веб-сервера с необходимым конфигурационным файлом:
+
+```
+[root@systemd system]# cd /etc/sysconfig
+```
+
+```
+[root@systemd sysconfig]# touch httpd-first
+```
+
+```
+[root@systemd sysconfig]# touch httpd-second
+```
+
+```
+[root@systemd sysconfig]# nano httpd-first 
+```
+
+```
+  GNU nano 2.9.8                                                                             httpd-first                                                                                        
+
+# /etc/sysconfig/httpd-first
+OPTIONS=-f conf/first.conf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                        [ Read 3 lines ]
+^G Get Help	 ^O Write Out     ^W Where Is	   ^K Cut Text      ^J Justify       ^C Cur Pos       M-U Undo         M-A Mark Text    M-] To Bracket   M-▲ Previous     ^B Back
+^X Exit          ^R Read File     ^\ Replace	   ^U Uncut Text    ^T To Spell      ^_ Go To Line    M-E Redo         M-6 Copy Text    M-W WhereIs Next M-▼ Next         ^F Forward
+```
+
+```
+[root@systemd sysconfig]# nano httpd-second
+```
+
+```
+  GNU nano 2.9.8                                                                             httpd-second                                                                                       
+
+# /etc/sysconfig/httpd-second
+OPTIONS=-f conf/second.conf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                        [ Read 3 lines ]
+^G Get Help	 ^O Write Out     ^W Where Is	   ^K Cut Text      ^J Justify       ^C Cur Pos       M-U Undo         M-A Mark Text    M-] To Bracket   M-▲ Previous     ^B Back
+^X Exit          ^R Read File     ^\ Replace	   ^U Uncut Text    ^T To Spell      ^_ Go To Line    M-E Redo         M-6 Copy Text    M-W WhereIs Next M-▼ Next         ^F Forward
+```
+
+Соответственно в директории с конфигами httpd `/etc/httpd/conf` должны лежать два конфига, в нашем случае это будут first.conf и second.conf:
+
+```
+[root@systemd sysconfig]# cd /etc/httpd/conf
+```
+
+```
+[root@systemd conf]# mv httpd.conf first.conf
+```
+
+```
+[root@systemd conf]# cp first.conf second.conf
+```
+
+Для удачного запуска, в конфигурационных файлах должны быть указаны уникальные для каждого экземпляра опции Listen и PidFile. Конфиги копируем и поправим только второй:
+
+```
+[root@systemd conf]# nano second.conf 
+```
+
+```
+...
+# same ServerRoot for multiple httpd daemons, you will need to change at
+# least PidFile.
+#
+ServerRoot "/etc/httpd"
+PidFile /var/run/httpd-second.pid
+
+#
+# Listen: Allows you to bind Apache to specific IP addresses and/or
+# ports, instead of the default. See also the <VirtualHost>
+# directive.
+#
+# Change this to Listen on specific IP addresses as shown below to 
+# prevent Apache from glomming onto all bound IP addresses.
+#
+#Listen 12.34.56.78:80
+Listen 8080
+
+#
+# Dynamic Shared Object (DSO) Support
+...
+
+^G Get Help	 ^O Write Out     ^W Where Is	   ^K Cut Text      ^J Justify       ^C Cur Pos       M-U Undo         M-A Mark Text    M-] To Bracket   M-▲ Previous     ^B Back
+^X Exit          ^R Read File     ^\ Replace	   ^U Uncut Text    ^T To Spell      ^_ Go To Line    M-E Redo         M-6 Copy Text    M-W WhereIs Next M-▼ Next         ^F Forward
+```
+
+Запустим сервис httpd:
+
+```
+[root@systemd conf]# systemctl start httpd@first
+```
+
+```
+[root@systemd conf]# systemctl start httpd@second
+```
+
+Проверим сервис. Посмотрим какие порты слушаются:
+
+```
+[root@systemd conf]# ss -tnulp | grep httpd
+```
+
+```
+tcp   LISTEN 0      511          0.0.0.0:8080      0.0.0.0:*    users:(("httpd",pid=31122,fd=3),("httpd",pid=31121,fd=3),("httpd",pid=31120,fd=3),("httpd",pid=31118,fd=3))
+tcp   LISTEN 0      511          0.0.0.0:80        0.0.0.0:*    users:(("httpd",pid=30900,fd=3),("httpd",pid=30899,fd=3),("httpd",pid=30898,fd=3),("httpd",pid=30896,fd=3))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
