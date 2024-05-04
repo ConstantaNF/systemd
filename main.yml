@@ -1,0 +1,21 @@
+---
+- name: systemd Otus learning
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Include service for log monitoring every 30 sec
+      include_tasks: ~/systemd/service/service.yml
+      tags:
+        - Service log monitoring
+
+    - name: Include spawn-fcgi service
+      include_tasks: ~/systemd/fcgi/fcgi.yml
+      tags:
+        - Service spawn-fcgi
+
+    - name: Include service for Apache
+      include_tasks: ~/systemd/apache/httpd.yml
+      tags:
+        - Service Apache
+...

@@ -1,0 +1,68 @@
+---
+    - name: Install nano
+      package:
+        name: nano
+        state: latest
+      tags:
+        - Install nano
+
+    - name: Copy watchlog configuration from localhost to systemd1
+      copy:
+        src: ~/systemd/service/watchlog
+        dest: /etc/sysconfig/
+        owner: root
+        group: root
+      tags:
+        - Copy watchlog configuration
+
+    - name: Make test logfile
+      shell: cat /var/log/messages > /var/log/watchlog.log
+      args:
+        executable: /bin/bash
+      tags:
+        - Make logfile
+
+    - name: Copy script from localhost to systemd1
+      copy:
+        src: ~/systemd/service/watchlog.sh
+        dest: /opt/watchlog.sh
+        owner: root
+        group: root
+        mode: 775
+      tags:
+        - Copy script
+
+    - name: Copy unit watchlog.service from localhost to systemd1
+      copy:
+        src: ~/systemd/service/watchlog.service
+        dest: /etc/systemd/system/watchlog.service
+        owner: root
+        group: root
+      tags:
+        - Copy unit watchlog.service
+
+    - name: Copy unit watchlog.timer from localhost to systemd1
+      copy:
+        src: ~/systemd/service/watchlog.timer
+        dest: /etc/systemd/system/watchlog.timer
+        owner: root
+        group: root
+      tags:
+        - Copy unit watchlog.timer
+
+    - name: Start units watchlog.service
+      systemd_service:
+        name: watchlog.service
+        state: started
+        enabled: true
+      tags:
+        - Start watchlog.timer
+
+    - name: Start units watchlog.timer
+      systemd_service:
+        name: watchlog.timer
+        state: started
+        enabled: true
+      tags:
+        - Start watchlog.timer
+...

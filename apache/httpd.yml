@@ -1,0 +1,69 @@
+---
+    - name: Install Apache
+      package:
+        name: httpd
+        state: latest
+      tags:
+        - Install Apache
+
+    - name: Copy unit httpd.service from localhost to systemd1
+      copy:
+        src: ~/systemd/apache/httpd.service
+        dest: /usr/lib/systemd/system/httpd.service
+        owner: root
+        group: root
+      tags:
+        - Copy httpd.service
+
+    - name: Copy environment files httpd.first
+      copy:
+        src: ~/systemd/apache/httpd.first
+        dest: /etc/sysconfig/httpd.first
+        owner: root
+        group: root
+      tags:
+        - Copy httpd.first
+
+    - name: Copy environment files httpd.second
+      copy:
+        src: ~/systemd/apache/httpd.second
+        dest: /etc/sysconfig/httpd.second
+        owner: root
+        group: root
+      tags:
+        - Copy httpd.second
+
+    - name: Copy configuration file for first Apache
+      copy:
+        src: ~/systemd/apache/first.conf
+        dest: /etc/httpd/conf/first.conf
+        owner: root
+        group: root
+      tags:
+        - Copy first.conf Apache
+
+    - name: Copy configuration file for second Apache
+      copy:
+        src: ~/systemd/apache/second.conf
+        dest: /etc/httpd/conf/second.conf
+        owner: root
+        group: root
+      tags:
+        - Copy second.conf Apache
+
+    - name: Start first Apache
+      systemd_service:
+        name: httpd@first
+        state: started
+        enabled: true
+      tags:
+        - Start first Apache
+
+    - name: Start second Apache
+      systemd_service:
+        name: httpd@second
+        state: started
+        enabled: true
+      tags: Start second Apache
+...
+

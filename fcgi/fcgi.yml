@@ -1,0 +1,33 @@
+---
+    - name: Install spawn-fcgi
+      shell: yum install epel-release -y && yum install spawn-fcgi php php-cli -y
+      args:
+        executable: /bin/bash
+      tags:
+        - install spawn-gcgi
+
+    - name: Copy spawn-fcgi configuration from localhost to systemd1
+      copy:
+        src: ~/systemd/fcgi/spawn-fcgi
+        dest: /etc/sysconfig/spawn-fcgi
+        owner: root
+        group: root
+      tags:
+        - copy spawn-fcgi config
+
+    - name: Copy unit spawn-fcgi.service from localhost to systemd1
+      copy:
+        src: ~/systemd/fcgi/spawn-fcgi.service
+        dest: /etc/systemd/system/spawn-fcgi.service
+        owner: root
+        group: root
+      tags: Copy unit spawn-fcgi
+
+    - name: Start unit spawn-fcgi.service
+      systemd_service:
+        name: spawn-fcgi.service
+        state: started
+        enabled: true
+      tags:
+        - Start spawn-fcgi.service
+...
