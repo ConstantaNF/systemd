@@ -55,7 +55,7 @@ adminkonstantin@2OSUbuntu:~/systemd$ vagrant ssh
 # Place it to /etc/sysconfig
 
 # File and word in that file that we will be monit
-WORD="error"
+WORD="Started"
 LOG=/var/log/watchlog.log
 
 
@@ -83,7 +83,7 @@ LOG=/var/log/watchlog.log
 ```
 
 ```
-[root@systemd log]# cat dnf.log > watchlog.log
+[root@systemd log]# cat /var/log/messages > /var/log/watchlog.log
 ```
 
 Создадим скрипт:
